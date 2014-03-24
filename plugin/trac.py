@@ -1647,7 +1647,15 @@ class Trac:
         self.ticket.current_ticket_id = False
         self.wiki.currentPage = False
 
-        self.server_url = self.server_list[server_key]
+        # Request password instead of including in config
+        import getpass
+        message = "Password for %s" % self.server_list[server_key]
+        vim.command('call inputsave()')
+        vim.command("let user_input = inputsecret('" + message + ": ')")
+        vim.command('call inputrestore()')
+        passwd = vim.eval('user_input')
+
+        self.server_url = self.server_list[server_key].replace("@", ":%s@" % passwd)
         self.server_name = server_key
         self.user = self.get_user(self.server_url)
 
